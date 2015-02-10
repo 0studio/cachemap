@@ -60,3 +60,22 @@ func TestSafeCacheMap32(t *testing.T) {
 	assert.False(t, ok)
 
 }
+
+func TestSafeCacheMapString(t *testing.T) {
+	m := NewStringSafeCacheMap(time.Microsecond)
+	now := time.Now()
+	obj := NewCacheObject("hello", now, 1)
+	m.Put("key", obj)
+	cacheObj, ok := m.Get("key", now)
+	assert.True(t, ok)
+	assert.True(t, "hello" == cacheObj.(string))
+	assert.Equal(t, 1, m.Size())
+	time.Sleep(1001 * time.Millisecond)
+	assert.Equal(t, 0, m.Size()) // expires obj should be deleted
+	cacheObj, ok = m.Get("key", time.Now())
+	assert.False(t, ok)
+
+	cacheObj, ok = m.Get("key_not_exists", time.Now())
+	assert.False(t, ok)
+
+}
