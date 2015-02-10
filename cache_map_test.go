@@ -22,3 +22,41 @@ func TestCacheMap(t *testing.T) {
 	assert.False(t, ok)
 
 }
+
+func TestSafeCacheMap(t *testing.T) {
+	m := NewUint64SafeCacheMap(time.Microsecond)
+	now := time.Now()
+	obj := NewCacheObject(100, now, 1)
+	m.Put(1, obj)
+	cacheObj, ok := m.Get(1, now)
+	assert.True(t, ok)
+	assert.True(t, 100 == cacheObj.(int))
+	assert.Equal(t, 1, m.Size())
+	time.Sleep(1001 * time.Millisecond)
+	assert.Equal(t, 0, m.Size()) // expires obj should be deleted
+	cacheObj, ok = m.Get(1, time.Now())
+	assert.False(t, ok)
+
+	cacheObj, ok = m.Get(2, time.Now())
+	assert.False(t, ok)
+
+}
+
+func TestSafeCacheMap32(t *testing.T) {
+	m := NewInt32SafeCacheMap(time.Microsecond)
+	now := time.Now()
+	obj := NewCacheObject(100, now, 1)
+	m.Put(1, obj)
+	cacheObj, ok := m.Get(1, now)
+	assert.True(t, ok)
+	assert.True(t, 100 == cacheObj.(int))
+	assert.Equal(t, 1, m.Size())
+	time.Sleep(1001 * time.Millisecond)
+	assert.Equal(t, 0, m.Size()) // expires obj should be deleted
+	cacheObj, ok = m.Get(1, time.Now())
+	assert.False(t, ok)
+
+	cacheObj, ok = m.Get(2, time.Now())
+	assert.False(t, ok)
+
+}
