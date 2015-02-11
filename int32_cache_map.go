@@ -112,3 +112,10 @@ func (safeMap *Int32SafeCacheMap) Delete(key int32) bool {
 	safeMap.delChan <- key
 	return true
 }
+func (safeMap *Int32SafeCacheMap) GetDirtyKeys() (keys []int32) {
+	keys = make([]int32, 0, len(safeMap.m))
+	for key, _ := range safeMap.m {
+		keys = append(keys, key)
+	}
+	return
+}

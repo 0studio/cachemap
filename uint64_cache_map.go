@@ -119,3 +119,10 @@ func (safeMap *Uint64SafeCacheMap) Delete(key uint64) bool {
 	safeMap.delChan <- key
 	return true
 }
+func (safeMap *Uint64SafeCacheMap) GetDirtyKeys() (keys []uint64) {
+	keys = make([]uint64, 0, len(safeMap.m))
+	for key, _ := range safeMap.m {
+		keys = append(keys, key)
+	}
+	return
+}

@@ -112,3 +112,10 @@ func (safeMap *StringSafeCacheMap) Delete(key string) bool {
 	safeMap.delChan <- key
 	return true
 }
+func (safeMap *StringSafeCacheMap) GetDirtyKeys() (keys []string) {
+	keys = make([]string, 0, len(safeMap.m))
+	for key, _ := range safeMap.m {
+		keys = append(keys, key)
+	}
+	return
+}
