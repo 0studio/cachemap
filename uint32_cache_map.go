@@ -5,12 +5,12 @@ import (
 )
 
 ////////////////////////////////////////////////////////////////////////////////
-type Int32CacheMap map[int32]CacheObject
+type Uint32CacheMap map[uint32]CacheObject
 
-func (m Int32CacheMap) Put(key int32, obj CacheObject) {
+func (m Uint32CacheMap) Put(key uint32, obj CacheObject) {
 	m[key] = obj
 }
-func (m Int32CacheMap) Get(key int32, now time.Time) (obj interface{}, ok bool) {
+func (m Uint32CacheMap) Get(key uint32, now time.Time) (obj interface{}, ok bool) {
 	var cacheObj CacheObject
 	cacheObj, ok = m[key]
 	if !ok {
@@ -23,36 +23,36 @@ func (m Int32CacheMap) Get(key int32, now time.Time) (obj interface{}, ok bool) 
 	return
 
 }
-func (m Int32CacheMap) Delete(key int32) (ok bool) {
+func (m Uint32CacheMap) Delete(key uint32) (ok bool) {
 	delete(m, key)
 	return true
 }
 
-type int32CacheObjectWapper struct {
+type uint32CacheObjectWapper struct {
 	obj CacheObject
-	key int32
+	key uint32
 }
-type int32resultGetter struct {
-	key    int32
+type uint32resultGetter struct {
+	key    uint32
 	now    time.Time
 	result chan resultWapper
 }
-type Int32SafeCacheMap struct {
-	m                 Int32CacheMap
-	setChan           chan int32CacheObjectWapper
-	getChan           chan int32resultGetter
-	delChan           chan int32
+type Uint32SafeCacheMap struct {
+	m                 Uint32CacheMap
+	setChan           chan uint32CacheObjectWapper
+	getChan           chan uint32resultGetter
+	delChan           chan uint32
 	cleanerTimer      chan bool
 	sizeChan          chan sizeGetter
 	autoCleanInterval time.Duration
 }
 
-func NewInt32SafeCacheMap(autoCleanInterval time.Duration) (m *Int32SafeCacheMap) {
-	m = &Int32SafeCacheMap{
-		m:                 make(Int32CacheMap),
-		setChan:           make(chan int32CacheObjectWapper),
-		getChan:           make(chan int32resultGetter),
-		delChan:           make(chan int32),
+func NewUint32SafeCacheMap(autoCleanInterval time.Duration) (m *Uint32SafeCacheMap) {
+	m = &Uint32SafeCacheMap{
+		m:                 make(Uint32CacheMap),
+		setChan:           make(chan uint32CacheObjectWapper),
+		getChan:           make(chan uint32resultGetter),
+		delChan:           make(chan uint32),
 		cleanerTimer:      make(chan bool),
 		sizeChan:          make(chan sizeGetter),
 		autoCleanInterval: autoCleanInterval,
@@ -87,11 +87,11 @@ func NewInt32SafeCacheMap(autoCleanInterval time.Duration) (m *Int32SafeCacheMap
 	}()
 	return
 }
-func (safeMap *Int32SafeCacheMap) Put(key int32, obj CacheObject) {
-	safeMap.setChan <- int32CacheObjectWapper{key: key, obj: obj}
+func (safeMap *Uint32SafeCacheMap) Put(key uint32, obj CacheObject) {
+	safeMap.setChan <- uint32CacheObjectWapper{key: key, obj: obj}
 }
-func (safeMap *Int32SafeCacheMap) Get(key int32, now time.Time) (obj interface{}, ok bool) {
-	getter := int32resultGetter{key: key, now: now, result: make(chan resultWapper)}
+func (safeMap *Uint32SafeCacheMap) Get(key uint32, now time.Time) (obj interface{}, ok bool) {
+	getter := uint32resultGetter{key: key, now: now, result: make(chan resultWapper)}
 	safeMap.getChan <- getter
 	result := <-getter.result
 	obj = result.obj
@@ -100,7 +100,7 @@ func (safeMap *Int32SafeCacheMap) Get(key int32, now time.Time) (obj interface{}
 	return
 }
 
-func (safeMap *Int32SafeCacheMap) Size() (size int) {
+func (safeMap *Uint32SafeCacheMap) Size() (size int) {
 	sizeGetter := sizeGetter{size: make(chan int)}
 	safeMap.sizeChan <- sizeGetter
 	size = <-sizeGetter.size
@@ -108,12 +108,12 @@ func (safeMap *Int32SafeCacheMap) Size() (size int) {
 	return
 }
 
-func (safeMap *Int32SafeCacheMap) Delete(key int32) bool {
+func (safeMap *Uint32SafeCacheMap) Delete(key uint32) bool {
 	safeMap.delChan <- key
 	return true
 }
-func (safeMap *Int32SafeCacheMap) GetDirtyKeys() (keys []int32) {
-	keys = make([]int32, 0, len(safeMap.m))
+func (safeMap *Uint32SafeCacheMap) GetDirtyKeys() (keys []uint32) {
+	keys = make([]uint32, 0, len(safeMap.m))
 	for key, _ := range safeMap.m {
 		keys = append(keys, key)
 	}
