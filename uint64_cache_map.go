@@ -76,7 +76,8 @@ func NewUint64SafeCacheMap(autoCleanInterval time.Duration) (m *Uint64SafeCacheM
 				m.m.Delete(delId)
 			case <-m.cleanerTimer:
 				now := time.Now()
-				for key, _ := range m.m {
+				keys := m.GetDirtyKeys()
+				for _, key := range keys {
 					m.m.Get(key, now) // m.Get will delete expire obj
 				}
 			case sizeGetter := <-m.sizeChan:

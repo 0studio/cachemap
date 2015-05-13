@@ -69,7 +69,8 @@ func NewStringSafeCacheMap(autoCleanInterval time.Duration) (m *StringSafeCacheM
 				m.m.Delete(delId)
 			case <-m.cleanerTimer:
 				now := time.Now()
-				for key, _ := range m.m {
+				keys := m.GetDirtyKeys()
+				for _, key := range keys {
 					m.m.Get(key, now) // m.Get will delete expire obj
 				}
 			case sizeGetter := <-m.sizeChan:
