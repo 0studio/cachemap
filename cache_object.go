@@ -4,15 +4,13 @@ import (
 	"time"
 )
 
-var UninitedTime time.Time
-
 type CacheObject struct {
 	expireTime time.Time
 	obj        interface{}
 }
 
 func (cacheObj *CacheObject) GetObject(now time.Time) (obj interface{}, ok bool) {
-	if cacheObj.expireTime == UninitedTime {
+	if cacheObj.expireTime.IsZero() {
 		ok = false
 		return
 	}
